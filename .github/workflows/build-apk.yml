@@ -25,6 +25,19 @@ jobs:
             echo "Ajoute le fichier du ZIP dans www/index.html puis le prochain push construira automatiquement l'APK."
           fi
 
+      - name: Vérifier l'icône et le splash
+        id: branding
+        if: steps.game.outputs.present == 'true'
+        shell: bash
+        run: |
+          if [ -f resources/icon.png ] && [ -f resources/splash.png ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            echo "Branding Tapas Fiesta trouvé."
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "Branding absent : le build utilisera les ressources Android par défaut."
+          fi
+
       - name: Installer Node.js
         if: steps.game.outputs.present == 'true'
         uses: actions/setup-node@v4
@@ -45,6 +58,32 @@ jobs:
       - name: Ajouter la plateforme Android
         if: steps.game.outputs.present == 'true'
         run: npx cap add android
+
+      - name: Préparer le branding Android sans modifier les originaux
+        if: steps.game.outputs.present == 'true' && steps.branding.outputs.present == 'true'
+        shell: bash
+        run: |
+          if ! command -v convert >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y imagemagick
+          fi
+          rm -rf .branding-build
+          mkdir -p .branding-build
+
+          # L'icône source reste intacte. On ne génère ici que les tailles techniques Android.
+          convert resources/icon.png -resize 1024x1024! .branding-build/icon-only.png
+
+          # Le splash original vertical reste intact. Une copie de build est simplement placée
+          # sur un fond crème afin de respecter le format carré demandé par les outils Android.
+          convert resources/splash.png \
+            -resize 2732x2732 \
+            -background '#F6EEDD' \
+            -gravity center \
+            -extent 2732x2732 \
+            .branding-build/splash.png
+
+          npm install --no-save @capacitor/assets
+          npx @capacitor/assets generate --android --assetPath .branding-build
 
       - name: Synchroniser le contenu web vers Android
         if: steps.game.outputs.present == 'true'
