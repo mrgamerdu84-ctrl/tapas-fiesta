@@ -1,0 +1,16 @@
+{
+  "name": "tapas-fiesta",
+  "version": "1.0.0",
+  "description": "Tapas Fiesta! - jeu de cartes mobile (webview autonome via Capacitor)",
+  "private": true,
+  "scripts": {
+    "build": "echo 'App statique, rien a compiler - le contenu est deja dans www/'"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
