@@ -81,6 +81,9 @@ jobs:
               p.write_text(s, encoding='utf-8')
           PY
 
+      - name: Apply Mexican fiesta UI and fix wheel
+        run: python3 scripts/patch_tapas_ui.py
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
