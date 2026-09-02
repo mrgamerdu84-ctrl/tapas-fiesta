@@ -34,6 +34,53 @@ jobs:
           fi
           test -s www/index.html
 
+      - name: Prepare Tapas Fiesta branding
+        shell: bash
+        run: |
+          set -e
+          mkdir -p resources
+          if [ -f Tapas_Fiesta_Branding.zip ]; then
+            rm -rf .branding-source
+            mkdir -p .branding-source
+            unzip -q Tapas_Fiesta_Branding.zip -d .branding-source
+            if [ -f .branding-source/resources/icon.png ]; then
+              cp .branding-source/resources/icon.png resources/icon.png
+            fi
+            if [ -f .branding-source/resources/splash.png ]; then
+              cp .branding-source/resources/splash.png resources/splash.png
+            fi
+          fi
+
+          if [ ! -s resources/icon.png ] || [ ! -s resources/splash.png ]; then
+            echo "ERROR: Tapas Fiesta icon/splash missing. Upload Tapas_Fiesta_Branding.zip."
+            exit 1
+          fi
+
+          # Keep the two originals intact. Only build copies are generated below.
+          cp resources/icon.png resources/icon-only.png
+          cp resources/splash.png www/tapas-fiesta-splash.png
+
+      - name: Add full-screen launch image to game shell
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('www/index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = 'id="tfLaunchSplash"'
+          if marker not in s:
+              css = '''\n<style id="tf-launch-splash-style">\n#tfLaunchSplash{position:fixed;inset:0;z-index:2147483647;background:#F6EEDD url("tapas-fiesta-splash.png") center center/contain no-repeat;opacity:1;pointer-events:none;transition:opacity .35s ease;}\n#tfLaunchSplash.tf-hide{opacity:0;}\n</style>\n'''
+              s = s.replace('</head>', css + '</head>', 1)
+              launch = '''\n<div id="tfLaunchSplash" aria-hidden="true"></div>\n<script>\n(function(){\n  var done=false;\n  function hideTapasSplash(){\n    if(done) return; done=true;\n    var el=document.getElementById('tfLaunchSplash');\n    if(!el) return;\n    el.classList.add('tf-hide');\n    setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); },400);\n  }\n  window.addEventListener('load',function(){setTimeout(hideTapasSplash,1400);},{once:true});\n  setTimeout(hideTapasSplash,3500);\n})();\n</script>\n'''
+              m = re.search(r'<body[^>]*>', s, flags=re.I)
+              if not m:
+                  raise SystemExit('ERROR: <body> not found in index.html')
+              s = s[:m.end()] + launch + s[m.end():]
+              p.write_text(s, encoding='utf-8')
+          PY
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -48,6 +95,16 @@ jobs:
 
       - name: Create Android project
         run: npx cap add android
+
+      - name: Generate Android icon and splash resources
+        shell: bash
+        run: |
+          npm install --no-save @capacitor/assets
+          npx @capacitor/assets generate --android \
+            --iconBackgroundColor '#F6EEDD' \
+            --iconBackgroundColorDark '#F6EEDD' \
+            --splashBackgroundColor '#F6EEDD' \
+            --splashBackgroundColorDark '#F6EEDD'
 
       - name: Sync game
         run: npx cap sync android
