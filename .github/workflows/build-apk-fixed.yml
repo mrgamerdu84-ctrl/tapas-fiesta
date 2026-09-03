@@ -92,6 +92,9 @@ jobs:
       - name: Install V6.2 wheel completion watchdog
         run: python3 scripts/fix_wheel_v62.py
 
+      - name: Fix V6.3 AI turn recovery
+        run: python3 scripts/fix_ai_v63.py
+
       - name: Add copyright protection notice
         run: python3 scripts/add_copyright.py
 
