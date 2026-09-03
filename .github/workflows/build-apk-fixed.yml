@@ -87,6 +87,9 @@ jobs:
       - name: Add copyright protection notice
         run: python3 scripts/add_copyright.py
 
+      - name: Add privacy policy and contact
+        run: python3 scripts/add_privacy.py
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
