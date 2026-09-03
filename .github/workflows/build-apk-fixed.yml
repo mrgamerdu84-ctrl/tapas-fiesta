@@ -84,6 +84,9 @@ jobs:
       - name: Apply Mexican fiesta UI and fix wheel
         run: python3 scripts/patch_tapas_ui.py
 
+      - name: Apply gameplay V6 polish
+        run: python3 scripts/patch_gameplay_v6.py
+
       - name: Add copyright protection notice
         run: python3 scripts/add_copyright.py
 
