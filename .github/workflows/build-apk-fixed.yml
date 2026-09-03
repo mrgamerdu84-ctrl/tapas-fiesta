@@ -56,7 +56,6 @@ jobs:
             exit 1
           fi
 
-          # Keep the two originals intact. Only build copies are generated below.
           cp resources/icon.png resources/icon-only.png
           cp resources/splash.png www/tapas-fiesta-splash.png
 
@@ -86,6 +85,9 @@ jobs:
 
       - name: Apply gameplay V6 polish
         run: python3 scripts/patch_gameplay_v6.py
+
+      - name: Fix V6.1 wheel stuck state
+        run: python3 scripts/fix_wheel_v61.py
 
       - name: Add copyright protection notice
         run: python3 scripts/add_copyright.py
