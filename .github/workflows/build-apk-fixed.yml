@@ -80,20 +80,28 @@ jobs:
               p.write_text(s, encoding='utf-8')
           PY
 
-      - name: Apply Mexican fiesta UI and fix wheel
+      - name: Apply approved Mexican fiesta design and wheel alignment fix
         run: python3 scripts/patch_tapas_ui.py
 
-      - name: Apply gameplay V6 polish
-        run: python3 scripts/patch_gameplay_v6.py
-
-      - name: Fix V6.1 wheel stuck state
-        run: python3 scripts/fix_wheel_v61.py
-
-      - name: Install V6.2 wheel completion watchdog
-        run: python3 scripts/fix_wheel_v62.py
-
-      - name: Fix V6.3 AI turn recovery
-        run: python3 scripts/fix_ai_v63.py
+      - name: Verify stable gameplay core
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s = Path('www/index.html').read_text(encoding='utf-8')
+          required = {
+              'ingredient gain': 'player.hand[seg.key]++;',
+              'mystery ingredient': 'if(seg.key === "epice")',
+              'mystery action': 'resolveCoupDePiment(atkIdx, defIdx',
+              'AI turn': 'function runAiTurn()',
+              'AI scheduling': 'setTimeout(runAiTurn, 800);',
+              'AI after spin': 'setTimeout(aiTryCookThenEnd, 700);',
+          }
+          missing = [name for name, marker in required.items() if marker not in s]
+          if missing:
+              raise SystemExit('ERROR stable gameplay core missing: ' + ', '.join(missing))
+          print('Stable gameplay core verified: ingredients + mystery + AI')
+          PY
 
       - name: Add copyright protection notice
         run: python3 scripts/add_copyright.py
