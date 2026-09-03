@@ -84,6 +84,9 @@ jobs:
       - name: Apply Mexican fiesta UI and fix wheel
         run: python3 scripts/patch_tapas_ui.py
 
+      - name: Add copyright protection notice
+        run: python3 scripts/add_copyright.py
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
