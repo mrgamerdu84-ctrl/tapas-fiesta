@@ -103,6 +103,35 @@ jobs:
           print('Stable gameplay core verified: ingredients + mystery + AI')
           PY
 
+      - name: Apply V7 wheel sound variety and new recipes
+        run: python3 scripts/patch_wheel_recipes_v7.py
+
+      - name: Verify V7 and stable core together
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s = Path('www/index.html').read_text(encoding='utf-8')
+          required = {
+              'ingredient gain': 'player.hand[seg.key]++;',
+              'mystery ingredient': 'if(seg.key === "epice")',
+              'AI scheduling': 'setTimeout(runAiTurn, 800);',
+              'wheel anti-repeat': 'function pickWheelIndex(state)',
+              'wheel audio unlock': 'function unlockWheelAudio()',
+              'pointer ratchet': 'tf-ratchet',
+              'new recipe 1': 'Tacos Guacamole',
+              'new recipe 2': 'Fajitas Fiesta',
+              'new recipe 3': 'Quesadilla Mystère',
+              'new recipe 4': 'Taco del Chef',
+              'new recipe 5': 'Nachos Supremo',
+              'new recipe 6': 'Fiesta del Fuego',
+          }
+          missing = [name for name, marker in required.items() if marker not in s]
+          if missing:
+              raise SystemExit('ERROR V7 validation failed: ' + ', '.join(missing))
+          print('V7 verified: sound + varied wheel + 16 recipes + stable ingredients/mystery/AI')
+          PY
+
       - name: Add copyright protection notice
         run: python3 scripts/add_copyright.py
 
@@ -112,6 +141,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Validate game JavaScript
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s = Path('www/index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>', s, flags=re.S|re.I)
+          if not scripts:
+              raise SystemExit('ERROR: no inline JavaScript found')
+          Path('/tmp/tapas-game.js').write_text(max(scripts, key=len), encoding='utf-8')
+          PY
+          node --check /tmp/tapas-game.js
 
       - uses: actions/setup-java@v4
         with:
