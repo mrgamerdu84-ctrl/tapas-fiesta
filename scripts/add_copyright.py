@@ -57,8 +57,8 @@ required = (
     'id="tfModeMobile"',
     'id="tfModeBoard"',
     'dicegame:"🎲 Dé Tapas !"',
-    'TF_TIKOWIKO_FAMILY_SPLASH',
-    'tikowiko-family-splash.webp',
+    'TF_TIKOWIKO_FAMILY_TAPAS_FIESTA_SPLASH',
+    'tikowiko-tapas-fiesta-splash.webp',
     'id="tfGameSplash"',
     'hideDeveloperSplash',
 )
@@ -74,4 +74,4 @@ for special in ('type:"coin"', 'type:"memory"', 'type:"bonus"', 'type:"exchange"
     if special not in final_html:
         raise SystemExit('ERROR: missing V10 wheel special: ' + special)
 
-print('Copyright + V10 Mobile gameplay + tikoWikoFamily developer splash added and validated')
+print('Copyright + V10 Mobile gameplay + tikoWikoFamily TAPAS FIESTA splash added and validated')
