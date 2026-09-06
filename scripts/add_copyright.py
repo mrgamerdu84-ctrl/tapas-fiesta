@@ -58,7 +58,7 @@ required = (
     'id="tfModeBoard"',
     'dicegame:"🎲 Dé Tapas !"',
     'TF_TIKOWIKO_FAMILY_TAPAS_FIESTA_SPLASH',
-    'tikowiko-tapas-fiesta-splash.webp',
+    'tikowiko-tapas-fiesta-splash.svg',
     'id="tfGameSplash"',
     'hideDeveloperSplash',
 )
