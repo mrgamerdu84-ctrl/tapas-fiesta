@@ -57,14 +57,16 @@ required = (
     'id="tfModeMobile"',
     'id="tfModeBoard"',
     'dicegame:"🎲 Dé Tapas !"',
-    'TF_TIKOWIKO_FAMILY_TAPAS_FIESTA_SPLASH',
-    'tikowiko-tapas-fiesta-splash.svg',
+    'TF_TIKOWIKO_FAMILY_ORIGINAL_TAPAS_FIESTA_SPLASH',
+    'tikowiko-original-vertical-splash.webp',
+    'id="tfLaunchGameName"',
+    'TAPAS FIESTA!',
     'id="tfGameSplash"',
     'hideDeveloperSplash',
 )
 missing = [marker for marker in required if marker not in final_html]
 if missing:
-    raise SystemExit('ERROR: V10/stable gameplay/splash validation failed: ' + ', '.join(missing))
+    raise SystemExit('ERROR: V10/stable gameplay/original splash validation failed: ' + ', '.join(missing))
 if 'Mime un piment' in final_html:
     raise SystemExit('ERROR: old physical mime challenge still present')
 if 'var tfShortLabels=' in final_html:
@@ -74,4 +76,4 @@ for special in ('type:"coin"', 'type:"memory"', 'type:"bonus"', 'type:"exchange"
     if special not in final_html:
         raise SystemExit('ERROR: missing V10 wheel special: ' + special)
 
-print('Copyright + V10 Mobile gameplay + tikoWikoFamily TAPAS FIESTA splash added and validated')
+print('Copyright + V10 Mobile + original tikoWikoFamily design + TAPAS FIESTA overlay validated')
