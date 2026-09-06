@@ -6,19 +6,23 @@ html_path = Path('www/index.html')
 html = html_path.read_text(encoding='utf-8')
 
 # IMPORTANT: use the real tikoWikoFamily vertical design supplied by the user.
-# The source artwork is never redrawn or edited. TAPAS FIESTA! is added only as
-# an HTML overlay so future games can reuse the same developer artwork safely.
-asset = Path('branding/tikowiko-original-vertical-splash.b64')
-if not asset.exists():
-    raise SystemExit('ERROR: original tikoWikoFamily vertical splash asset is missing')
-encoded = ''.join(asset.read_text(encoding='utf-8').split())
+# The artwork is only resized/compressed for the APK; it is never redrawn.
+# TAPAS FIESTA! is added as an HTML overlay so future games can reuse the same
+# official developer image while showing their own game name.
+parts = [Path(f'branding/original-splash/part{i:02d}.b64') for i in range(1, 9)]
+if not all(p.exists() for p in parts):
+    missing = [str(p) for p in parts if not p.exists()]
+    raise SystemExit('ERROR: original tikoWikoFamily splash chunks missing: ' + ', '.join(missing))
+encoded = ''.join(''.join(p.read_text(encoding='utf-8').split()) for p in parts)
 try:
     splash_bytes = base64.b64decode(encoded, validate=True)
 except Exception as exc:
-    raise SystemExit('ERROR: invalid original tikoWikoFamily splash base64: ' + str(exc))
+    raise SystemExit('ERROR: invalid original tikoWikoFamily splash chunks: ' + str(exc))
 
 if not splash_bytes.startswith(b'RIFF') or b'WEBP' not in splash_bytes[:20]:
     raise SystemExit('ERROR: original tikoWikoFamily splash is not a valid WebP image')
+if len(splash_bytes) < 30000:
+    raise SystemExit('ERROR: original tikoWikoFamily splash is unexpectedly small')
 Path('www/tikowiko-original-vertical-splash.webp').write_bytes(splash_bytes)
 
 if not Path('www/tapas-fiesta-splash.png').exists():
