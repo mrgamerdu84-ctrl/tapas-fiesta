@@ -5,14 +5,11 @@ import re
 html_path = Path('www/index.html')
 html = html_path.read_text(encoding='utf-8')
 
-# Rebuild the official tikoWikoFamily red-panda developer splash from repository chunks.
-parts = [
-    Path('branding/tikowiko-family-splash.part1.b64'),
-    Path('branding/tikowiko-family-splash.part2.b64'),
-]
-if not all(p.exists() for p in parts):
-    raise SystemExit('ERROR: tikoWikoFamily splash chunks are missing')
-encoded = ''.join(p.read_text(encoding='utf-8').strip() for p in parts)
+# Rebuild the official tikoWikoFamily red-panda developer splash from a compact repository asset.
+asset = Path('branding/tikowiko-family-splash.b64')
+if not asset.exists():
+    raise SystemExit('ERROR: tikoWikoFamily splash asset is missing')
+encoded = ''.join(asset.read_text(encoding='utf-8').split())
 try:
     splash_bytes = base64.b64decode(encoded, validate=True)
 except Exception as exc:
@@ -22,7 +19,7 @@ if not splash_bytes.startswith(b'RIFF') or b'WEBP' not in splash_bytes[:20]:
     raise SystemExit('ERROR: developer splash is not a valid WebP image')
 Path('www/tikowiko-family-splash.webp').write_bytes(splash_bytes)
 
-# The native workflow already copied the approved Tapas Fiesta splash into www/tapas-fiesta-splash.png.
+# The workflow already copied the approved Tapas Fiesta splash into www/tapas-fiesta-splash.png.
 if not Path('www/tapas-fiesta-splash.png').exists():
     raise SystemExit('ERROR: Tapas Fiesta game splash missing')
 
