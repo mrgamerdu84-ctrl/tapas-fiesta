@@ -9,13 +9,14 @@ if meta not in s:
     s = s.replace('</head>', '  ' + meta + '\n</head>', 1)
 p.write_text(s, encoding='utf-8')
 
-# Gameplay stages: stable V7 -> Pièce Mexico -> Fiesta Games V8 -> V8.1 -> V8.2 -> V9 -> V9.1.
+# Gameplay stages: stable V7 -> Pièce Mexico -> Fiesta Games V8 -> V8.1 -> V8.2 -> V9 -> V9.1 -> V10 Mobile.
 runpy.run_path('scripts/patch_coin_mexico_v71.py', run_name='__main__')
 runpy.run_path('scripts/patch_fiesta_games_v8.py', run_name='__main__')
 runpy.run_path('scripts/fix_v81_memory_wheel_ai.py', run_name='__main__')
 runpy.run_path('scripts/fix_v82_visibility.py', run_name='__main__')
 runpy.run_path('scripts/patch_gameplay_v9.py', run_name='__main__')
 runpy.run_path('scripts/patch_memory_voice_v91.py', run_name='__main__')
+runpy.run_path('scripts/patch_mobile_v10.py', run_name='__main__')
 
 final_html = p.read_text(encoding='utf-8')
 required = (
@@ -48,17 +49,24 @@ required = (
     'Nouvelle manche automatique',
     'st.roundStarter',
     'possède trois recettes et remporte la Tapas Fiesta',
+    'type:"dicegame"',
+    'function tfRunDiceTapas(',
+    'Dé Tapas — Duel',
+    'tf-die3d',
+    'id="tfModeMobile"',
+    'id="tfModeBoard"',
+    'dicegame:"🎲 Dé Tapas !"',
 )
 missing = [marker for marker in required if marker not in final_html]
 if missing:
-    raise SystemExit('ERROR: V9.1/stable gameplay validation failed: ' + ', '.join(missing))
+    raise SystemExit('ERROR: V10/stable gameplay validation failed: ' + ', '.join(missing))
 if 'Mime un piment' in final_html:
     raise SystemExit('ERROR: old physical mime challenge still present')
 if 'var tfShortLabels=' in final_html:
     raise SystemExit('ERROR: old text labels are still drawn inside the wheel')
 
-for special in ('type:"coin"', 'type:"memory"', 'type:"bonus"', 'type:"exchange"', 'type:"bomb"', 'type:"lightning"', 'type:"mask"'):
+for special in ('type:"coin"', 'type:"memory"', 'type:"bonus"', 'type:"exchange"', 'type:"bomb"', 'type:"lightning"', 'type:"mask"', 'type:"dicegame"'):
     if special not in final_html:
-        raise SystemExit('ERROR: missing V9 wheel special: ' + special)
+        raise SystemExit('ERROR: missing V10 wheel special: ' + special)
 
-print('Copyright + V9.1 gameplay/voice added and validated')
+print('Copyright + V10 Mobile gameplay added and validated')
