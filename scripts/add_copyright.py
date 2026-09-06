@@ -17,6 +17,7 @@ runpy.run_path('scripts/fix_v82_visibility.py', run_name='__main__')
 runpy.run_path('scripts/patch_gameplay_v9.py', run_name='__main__')
 runpy.run_path('scripts/patch_memory_voice_v91.py', run_name='__main__')
 runpy.run_path('scripts/patch_mobile_v10.py', run_name='__main__')
+runpy.run_path('scripts/patch_developer_splash_v10.py', run_name='__main__')
 
 final_html = p.read_text(encoding='utf-8')
 required = (
@@ -56,10 +57,14 @@ required = (
     'id="tfModeMobile"',
     'id="tfModeBoard"',
     'dicegame:"🎲 Dé Tapas !"',
+    'TF_TIKOWIKO_FAMILY_SPLASH',
+    'tikowiko-family-splash.webp',
+    'id="tfGameSplash"',
+    'hideDeveloperSplash',
 )
 missing = [marker for marker in required if marker not in final_html]
 if missing:
-    raise SystemExit('ERROR: V10/stable gameplay validation failed: ' + ', '.join(missing))
+    raise SystemExit('ERROR: V10/stable gameplay/splash validation failed: ' + ', '.join(missing))
 if 'Mime un piment' in final_html:
     raise SystemExit('ERROR: old physical mime challenge still present')
 if 'var tfShortLabels=' in final_html:
@@ -69,4 +74,4 @@ for special in ('type:"coin"', 'type:"memory"', 'type:"bonus"', 'type:"exchange"
     if special not in final_html:
         raise SystemExit('ERROR: missing V10 wheel special: ' + special)
 
-print('Copyright + V10 Mobile gameplay added and validated')
+print('Copyright + V10 Mobile gameplay + tikoWikoFamily developer splash added and validated')
