@@ -9,7 +9,7 @@ if meta not in s:
     s = s.replace('</head>', '  ' + meta + '\n</head>', 1)
 p.write_text(s, encoding='utf-8')
 
-# Gameplay stages: stable V7 -> Pièce Mexico -> Fiesta Games V8 -> V8.1 -> V8.2 -> V9 -> V9.1 -> V10 Mobile.
+# Stable gameplay stages. Keep this order to avoid regressions.
 runpy.run_path('scripts/patch_coin_mexico_v71.py', run_name='__main__')
 runpy.run_path('scripts/patch_fiesta_games_v8.py', run_name='__main__')
 runpy.run_path('scripts/fix_v81_memory_wheel_ai.py', run_name='__main__')
@@ -18,6 +18,7 @@ runpy.run_path('scripts/patch_gameplay_v9.py', run_name='__main__')
 runpy.run_path('scripts/patch_memory_voice_v91.py', run_name='__main__')
 runpy.run_path('scripts/patch_mobile_v10.py', run_name='__main__')
 runpy.run_path('scripts/patch_developer_splash_v10.py', run_name='__main__')
+runpy.run_path('scripts/fix_startup_music_v101.py', run_name='__main__')
 
 final_html = p.read_text(encoding='utf-8')
 required = (
@@ -57,16 +58,22 @@ required = (
     'id="tfModeMobile"',
     'id="tfModeBoard"',
     'dicegame:"🎲 Dé Tapas !"',
-    'TF_TIKOWIKO_FAMILY_ORIGINAL_TAPAS_FIESTA_SPLASH',
+    'TF_TIKOWIKO_FAMILY_ORIGINAL_TAPAS_FIESTA_SPLASH_V101',
     'tikowiko-original-vertical-splash.webp',
     'id="tfLaunchGameName"',
     'TAPAS FIESTA!',
-    'id="tfGameSplash"',
+    'id="tfLaunchSplash"',
     'hideDeveloperSplash',
+    'TF_MUSIC_CONTROL_V101',
+    'tfMusicLevelV101',
+    'id = "tfMusicPanel"',
+    '🔇 Muet',
 )
 missing = [marker for marker in required if marker not in final_html]
 if missing:
-    raise SystemExit('ERROR: V10/stable gameplay/original splash validation failed: ' + ', '.join(missing))
+    raise SystemExit('ERROR: V10.1 stable gameplay/startup/music validation failed: ' + ', '.join(missing))
+if 'id="tfGameSplash"' in final_html or 'hideGameSplash' in final_html:
+    raise SystemExit('ERROR: old double startup splash is still present')
 if 'Mime un piment' in final_html:
     raise SystemExit('ERROR: old physical mime challenge still present')
 if 'var tfShortLabels=' in final_html:
@@ -76,4 +83,4 @@ for special in ('type:"coin"', 'type:"memory"', 'type:"bonus"', 'type:"exchange"
     if special not in final_html:
         raise SystemExit('ERROR: missing V10 wheel special: ' + special)
 
-print('Copyright + V10 Mobile + original tikoWikoFamily design + TAPAS FIESTA overlay validated')
+print('V10.1 validated: stable gameplay + clean one-screen startup + persistent music control')
